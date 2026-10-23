@@ -1,5 +1,18 @@
-import streamlit as st
-import google.generativeai as genai
+import importlib
+
+try:
+    st = importlib.import_module("streamlit")
+except ModuleNotFoundError as exc:
+    if exc.name != "streamlit":
+        raise
+    raise SystemExit("Streamlit non è installato. Installalo con: pip install streamlit") from exc
+
+try:
+    genai = importlib.import_module("google.generativeai")
+except ModuleNotFoundError as exc:
+    if exc.name not in {"google", "google.generativeai"}:
+        raise
+    genai = None
 
 # ==========================================
 # 1. DATABASE COMPONENTI (Logica Rigida)
@@ -109,7 +122,9 @@ st.subheader("2. Genera la Guida di Montaggio con l'IA")
 API_KEY = "INSERISCI_QUI_LA_TUA_CHIAVE_API" 
 
 if st.button("Genera Tutorial Passo-Passo"):
-    if API_KEY == "INSERISCI_QUI_LA_TUA_CHIAVE_API":
+    if genai is None:
+        st.warning("Il pacchetto google-generativeai non è installato. Installalo con: pip install google-generativeai")
+    elif API_KEY == "INSERISCI_QUI_LA_TUA_CHIAVE_API":
         st.warning("Inserisci la tua API Key di Gemini nel codice riga 114 per attivare questa funzione.")
     else:
         with st.spinner('L\'IA sta scrivendo la guida personalizzata...'):
